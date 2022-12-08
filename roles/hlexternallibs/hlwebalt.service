@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Monitorscout web interface
+ConditionPathExists={{hlweb_home}}/hlwebalt
+After=network.target
+
+[Service]
+TimeoutStartSec=60
+Type=simple
+User={{hlweb_username}}
+Group={{hlweb_username}}
+SyslogIdentifier={{hlweb_servicename}}
+ExecStart={{virtualenv.stdout}}/bin/{{hlweb_cmd}}
+WorkingDirectory={{hlweb_django_appdir}}
+
+[Install]
+WantedBy=multi-user.target

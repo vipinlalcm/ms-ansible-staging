@@ -1,0 +1,62 @@
+- name: Install depentencies for hlwebalt applications.
+  apt:
+    name: "{{webalt_dep}}"
+    state: present
+
+- block:
+  - name: Install pip packages.
+    command: "pipenv run pip install {{item}}"
+    args:
+      chdir: "{{virt_env_path}}"
+    with_items: "{{webalt_pip_pkgs}}"
+    tags: hlwebalt_pip_install
+  - name: Adding python libs in .bashrc
+    lineinfile:
+      path: "~/.bashrc"
+      state: present
+      insertafter: EOF
+      line: "export PYTHONPATH=$PYTHONPATH:$HOME/apps/hlpylib:$HOME/apps/hlexternallibs/libs"
+  - name: Cloning hlwebalt
+    git:
+      repo: 'http://{{git_user}}:{{git_token}}@hl.test.io/monitoring/monitorscout/hlwebalt.git'
+      version: master
+      dest: "{{virt_env_path}}/apps/hlwebalt"
+      clone: yes
+    tags: hlwebalt_clone
+
+  - name: Removing inbuild Pipfiles
+    file:
+     path: "{{virt_env_path}}/apps/hlwebalt/{{item}}"
+     state: absent
+    with_items:
+      - Pipfile
+      - Pipfile.lock
+    tags: hlwebalt_setupfile_install
+
+  - name: Checking the requirements.txt
+    stat:
+      path: "{{virt_env_path}}/apps/hlwebalt/requirements.txt"
+    register: hlwebalt_requirements_file
+
+  - name: Install hlwebalt requirements
+    command: pipenv run pip install -r requirements.txt
+    args:
+      chdir: "{{virt_env_path}}/apps/hlwebalt"
+    when: hlwebalt_requirements_file.stat.exists == True
+    tags: hlwebalt_requirefile_install
+
+  - name: Checking setup.py file
+    stat:
+      path: "{{virt_env_path}}/apps/hlwebalt/setup.py"
+    register: hlwebalt_setup_file
+    tags: hlwebalt_setupfile_install
+
+  - name: Setting up applications pipenv run python setup.py install
+    command: pipenv run python setup.py install
+    args:
+      chdir: "{{virt_env_path}}/apps/hlwebalt/"
+    when: hlwebalt_setup_file.stat.exists == True
+    tags: hlwebalt_setupfile_install
+  become: true
+  become_user: "{{becomeusr}}"
+  become_method: sudo

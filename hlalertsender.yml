@@ -1,0 +1,18 @@
+- hosts: Staging_Alertsenders
+  become: true
+  roles:
+    - common
+    - useradd
+    - create_virtualenv
+    - hlexternallibs
+    - hlpylib
+    - hlentitymanager
+    - hlreporter-collectors
+    - hlsharedentities
+    - hlerrorlog
+    - hlhousekeeper
+    - hlmessagereceiver
+    - hlalertsender
+    - hlmanagement
+  vars_files:
+     - vars/main.yml

@@ -1,0 +1,6 @@
+- name: Install MariaDB
+  apt:
+    name: "{{apt_dep_pkg}}"
+    state: present
+    update_cache: yes
+  notify: start mysql

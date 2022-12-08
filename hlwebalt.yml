@@ -1,0 +1,13 @@
+- hosts: Staging_Webservers
+  become: true
+  roles:
+     - common
+     - useradd
+     - create_virtualenv
+     - hlexternallibs
+     - hlpylib
+     - hlwebalt
+     - django
+     - nginx
+  vars_files:
+     - vars/main.yml

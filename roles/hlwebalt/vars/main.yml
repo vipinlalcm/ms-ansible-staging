@@ -1,0 +1,15 @@
+webalt_dep:
+  - python-dateutil
+  - python-textile
+webalt_pip_pkgs:
+  - mysql-python
+  - python-dateutil
+  - python-memcached
+  - pyes
+  - textile
+  - pymysql
+  - gunicorn
+  - service-identity
+  - GeoIP
+applications:
+  - hlwebalt

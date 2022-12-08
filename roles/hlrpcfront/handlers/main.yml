@@ -1,0 +1,8 @@
+- name: start elasticsearch
+  service:
+    name: elasticsearch
+    state: started
+- name: start memcached
+  service:
+    name: memcached
+    state: started

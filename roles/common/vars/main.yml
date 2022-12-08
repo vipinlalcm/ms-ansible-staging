@@ -1,0 +1,13 @@
+apt_dep_pkg:
+  - python-pip
+  - git
+  - python-dev
+  - libmysqlclient-dev
+  - libgeoip-dev
+  - openssl
+  
+pip_dep_pkg:
+  - pipenv
+
+yum_dep_pkg:
+  - python-pip

@@ -1,0 +1,19 @@
+- hosts: delegator_migration
+  become: true
+  roles:
+    - common
+    - useradd
+    - create_virtualenv
+    - hlexternallibs
+    - hlpylib
+    - hlentitymanager
+    - hlsharedentities
+    - hlreporter-collectors
+    - hlvaluestore
+    - hlrrdstore
+    - hldelegator
+    - hlvaluestorereader
+    - hlmanagement
+
+  vars_files:
+     - vars/main.yml

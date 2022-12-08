@@ -1,0 +1,4 @@
+elasticsearch_pkgs:
+  - elasticsearch
+  - default-jre
+  - default-jdk

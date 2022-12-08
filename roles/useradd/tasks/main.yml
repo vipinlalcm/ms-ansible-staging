@@ -1,0 +1,15 @@
+- name: creating /var/opt/ directory
+  file:
+    path: "{{directory_path}}"
+    state: directory
+    mode: 0755
+
+- name: Creating hlapps user.
+  user:
+    name: "{{username}}"
+    comment: "{{comment_for_user}}"
+    groups: sudo
+    shell: "{{login_shell}}"
+    create_home: yes
+    home: "{{home_dir}}"
+    state: present

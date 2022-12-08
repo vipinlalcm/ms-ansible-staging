@@ -1,0 +1,12 @@
+hlweb_servicename: hlwebalt_staging
+hlweb_home: /var/opt/hlapps/apps
+hlweb_username: hlapps
+hlweb_listen_host: localhost
+hlweb_listen_port: 3001
+hlweb_webroot: "/var/www/hlweb"
+hlweb_packagename: "hlwebalt"
+hlweb_django_appdir: "{{hlweb_webroot}}/{{hlweb_servicename}}"
+hlweb_django_projectdir: "{{hlweb_django_appdir}}/{{hlweb_servicename}}"
+hlweb_env:
+  PATH: "$PATH:{{hlweb_home}}/.local/bin:/usr/bin"
+hlweb_cmd: "gunicorn --pythonpath={{hlweb_home}}/{{hlweb_packagename}} {{hlweb_servicename}}.wsgi --workers 5 --log-level DEBUG --bind {{hlweb_listen_host}}:{{hlweb_listen_port}}"

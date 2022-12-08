@@ -1,0 +1,17 @@
+- name: Install elasticsearch
+  apt:
+   name: "{{elasticsearch_pkgs}}"
+   state: present
+
+- name: Configure elasticsearch /etc/default/elasticsearch
+  template:
+    src: default/elasticsearch.j2
+    dest: /etc/default/elasticsearch
+    backup: yes
+
+- name: Configuring elasticsearch main configurartion
+  template:
+    src: etc/elasticsearch/elasticsearch.yml.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+    backup: yes
+  notify: start elasticsearch

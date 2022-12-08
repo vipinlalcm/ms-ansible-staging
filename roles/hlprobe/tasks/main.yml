@@ -1,0 +1,161 @@
+- block:
+  - name: apt package dependency installing.
+    apt:
+      name: "{{hlprobe_dep_apt_pkg}}"
+      state: present
+
+  - name: creating /var/opt/ directory
+    file:
+      path: "{{hlprobe_home}}"
+      state: directory
+      recurse: yes
+      mode: 0755
+
+  - name: Creating hlprobe user.
+    user:
+      name: "{{hlprobe_username}}"
+      comment: "{{comment_for_user}}"
+      groups: sudo
+      shell: "{{hlprobe_login_shell}}"
+      create_home: yes
+      home: "{{hlprobe_home}}"
+      state: present
+
+  - name: changing the directory permission for hlprobe home directory.
+    file:
+      path: "{{virt_env_path}}"
+      owner: "{{hlprobe_username}}"
+      group: "{{hlprobe_username}}"
+      state: directory
+      recurse: yes
+    tags: virtual
+
+  - name: Creating necessary directories for applications.
+    file:
+      path: "{{virt_env_path}}/{{item}}"
+      state: directory
+      owner: "{{hlprobe_username}}"
+      group: "{{hlprobe_username}}"
+      mode: 0755
+    with_items: "{{app_dirs}}"
+
+  become: true
+  become_user: root
+  become_method: sudo
+
+- name: Create virtualenv for user hlprobe.
+  shell: pipenv --two shell exit
+  become: true
+  become_user: hlprobe
+  become_method: sudo
+  args:
+    chdir: "{{virt_env_path}}"
+  tags: virtual
+
+- block:
+
+  - name: Extracting the repo hlprobe in remote machine
+    unarchive:
+      src: "files/hlprobe.tar.gz"
+      dest: "{{virt_env_path}}/apps/"
+
+  - name: Extracting the repo hlprobe-binaries in remote machine
+    unarchive:
+      src: "files/hlprobe-binaries.tar.gz"
+      dest: "{{virt_env_path}}/apps/hlprobe/"
+
+  # - name: Cloning hlprobe
+  #   git:
+  #     repo: 'http://{{git_user}}:{{git_token}}@hl.test.io:monitoring/monitorscout/hlprobe.git'
+  #     version: live
+  #     dest: "{{virt_env_path}}/apps/hlprobe"
+  #     clone: yes
+  #   tags: hlprobe_clone
+  - name: Find virtualenv PATH
+    command: pipenv --venv
+    args:
+     chdir: "{{virt_env_path}}"
+    register: virtualenv
+    tags: workaround, systemd, install
+
+  - name: setting hlprobe_virtualenv as variable
+    set_fact:
+      hlprobe_virtualenv: "{{virtualenv.stdout}}"
+    tags: workaround, systemd, install
+
+  - name: Install hlprobe pip packages
+    command: "{{hlprobe_virtualenv}}/bin/pip install {{item}}"
+    args:
+      chdir: "{{virt_env_path}}/apps/hlprobe"
+    with_items: "{{hlprobe_pypi_dependencies}}"
+    tags: install
+
+  - name: Checking the requirements.txt
+    stat:
+      path: "{{virt_env_path}}/apps/hlprobe/requirements.txt"
+    register: hlprobe_requirements_file
+
+  - name: Install hlprobe requirements
+    command: "{{hlprobe_virtualenv}}/bin/pip install {{virt_env_path}}/apps/hlprobe/requirements.txt"
+    args:
+      chdir: "{{virt_env_path}}/apps/hlprobe"
+    when: hlprobe_requirements_file.stat.exists == True
+    tags: hlprobe_requirefile_install
+
+  - name: Checking setup.py file
+    stat:
+      path: "{{virt_env_path}}/apps/hlprobe/setup.py"
+    register: hlprobe_setup_file
+
+  - name: Setting up applications pipenv run python setup.py install
+    command: "{{hlprobe_virtualenv}}/bin/python {{virt_env_path}}/apps/hlprobe/setup.py install"
+    args:
+      chdir: "{{virt_env_path}}/apps/hlprobe"
+    when: hlprobe_setup_file.stat.exists == True
+    tags: hlprobe_setupfile_install
+
+  - name: workaround for executable bit
+    file:
+      path: "{{hlprobe_virtualenv}}/lib/python2.7/site-packages/hlprobe-0.1.0-py2.7.egg/hlprobelib/external/{{item}}"
+      mode: 0755
+    with_items:
+      - detect_msgpack.py
+      - detect_pynetsnmp.py
+    tags: workaround
+
+  # - name: clone hlprobe-binaries git repo
+  #   git:
+  #     repo: 'http://{{git_user}}:{{git_token}}@hl.test.io:monitoring/monitorscout/hlprobe-binaries.git'
+  #     version: live
+  #     dest: "{{virt_env_path}}/apps/hlprobe-binaries"
+  #     clone: yes
+  #   tags: hlprobe_clone
+  become: true
+  become_user: hlprobe
+  become_method: sudo
+
+- block:
+
+  - name: install hlprobe config file
+    template:
+      src: templates/etc/hlprobe.conf.j2
+      dest: "/etc/hlprobe-{{item.probe_port}}.conf"
+      owner: "{{hlprobe_username}}"
+      mode: 0600
+    notify: restart hlprobe
+    with_items: "{{hlprobe.probes}}"
+
+  - name: install hlprobe systemd unit
+    template:
+      src: templates/etc/systemd/system/hlprobe.service.j2
+      dest: "/etc/systemd/system/hlprobe-{{item.probe_port}}.service"
+    notify:
+      - systemctl daemon-reload
+      - restart hlprobe
+    with_items: "{{hlprobe.probes}}"
+    when: ansible_service_mgr == 'systemd'
+    tags: systemd
+
+  become: true
+  become_user: root
+  become_method: sudo

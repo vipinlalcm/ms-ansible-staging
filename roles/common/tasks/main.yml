@@ -1,0 +1,10 @@
+- name: Install apt package depentencies
+  apt:
+    name: "{{apt_dep_pkg}}"
+    state: present
+
+
+- name: Install pip package depentencies
+  pip:
+   name: "{{pip_dep_pkg}}"
+   state: present

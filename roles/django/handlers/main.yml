@@ -1,0 +1,8 @@
+- name: restart hlweb
+  service:
+    name: "{{hlweb_servicename}}"
+    state: restarted
+    enabled: True
+- name: systemctl daemon-reload
+  systemd:
+      daemon_reload: True

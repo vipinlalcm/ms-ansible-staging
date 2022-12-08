@@ -1,0 +1,9 @@
+alert_sender_pip_pkg:
+  - MySQL-python
+alert_sender_apt_pkg:
+  - postfix
+  - python-zookeeper
+  - python-txzookeeper
+  - python-reportlab
+  - python-tz
+  - python-twisted

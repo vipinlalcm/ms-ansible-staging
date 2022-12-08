@@ -1,0 +1,12 @@
+- block:
+  - name: Cloning hlreporter-collectors
+    git:
+      repo: 'http://{{git_user}}:{{git_token}}@hl.test.io/monitoring/monitorscout/hlreporter-collectors.git'
+      version: master
+      dest: "{{virt_env_path}}/apps/hlreporter-collectors"
+      clone: yes
+    tags: hlreporter-collectors_clone
+
+  become: true
+  become_user: "{{becomeusr}}"
+  become_method: sudo

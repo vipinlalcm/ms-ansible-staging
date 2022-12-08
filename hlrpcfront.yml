@@ -1,0 +1,22 @@
+- hosts: Staging_RPC_fronts
+  become: true
+  roles:
+    - elasticsearch
+    - memcached
+    - common
+    - useradd
+    - create_virtualenv
+    - hlrpcfront
+    - hlentitymanager
+    - hlsharedentities
+    - hlpylib
+    - hldpbridge
+    - hlkeys
+    - hlmessagereceiver
+    - hlreportgen
+    - hlwebservice
+    - hlexternallibs
+    - hlmanagement
+
+  vars_files:
+     - vars/main.yml

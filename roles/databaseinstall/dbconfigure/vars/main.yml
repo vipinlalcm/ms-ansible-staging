@@ -1,0 +1,23 @@
+mysql_root_user: root
+mysql_root_pass: vou80o8zgC
+allow_hosts:
+  - localhost
+  - 81.91.0.0/24
+  - 192.168.0.0/16
+  - 213.180.64.0/19
+  - 213.180.69.16/29
+  - 213.180.65.2
+  - 192.121.252.213
+  - 213.238.199.31
+alt_web_allow_hosts:
+  - localhost
+  - staging-w1.w.monitorscout.com
+  - staging-w2.w.monitorscout.com
+monitorscout_database: health1_staging
+monitorscout_database_user: health_stag_usr
+monitorscout_database_pass: Wc0WF0y6Ga
+monitorscout_session_db: altweb_sessions
+monitorscout_session_db_user: altweb_sess_user
+monitorscout_session_db_pass: 6WQYMxiaZi
+monitorscout_db_file: monitorscout.sql
+monitorscout_session_db_file: altweb_sessions.sql

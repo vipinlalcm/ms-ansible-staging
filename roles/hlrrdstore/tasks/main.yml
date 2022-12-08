@@ -1,0 +1,36 @@
+- block:
+  - name: Cloning hlrrdstore
+    git:
+      repo: 'http://{{git_user}}:{{git_token}}@hl.test.io/monitoring/monitorscout/hlrrdstore.git'
+      version: master
+      dest: "{{virt_env_path}}/apps/hlrrdstore"
+      clone: yes
+    tags: hlrrdstore_clone
+
+  - name: Checking the requirements.txt
+    stat:
+      path: "{{virt_env_path}}/apps/hlrrdstore/requirements.txt"
+    register: hlrrdstore_requirements_file
+
+  - name: Install hlrrdstore requirements
+    command: pipenv run pip install -r requirements.txt
+    args:
+      chdir: "{{virt_env_path}}/apps/hlrrdstore"
+    when: hlrrdstore_requirements_file.stat.exists == True
+    tags: hlrrdstore_requirefile_install
+
+  - name: Checking setup.py file
+    stat:
+      path: "{{virt_env_path}}/apps/hlrrdstore/setup.py"
+    register: hlrrdstore_setup_file
+
+  - name: Setting up applications pipenv run python setup.py install
+    command: pipenv run python setup.py install
+    args:
+      chdir: "{{virt_env_path}}/apps/hlrrdstore"
+    when: hlrrdstore_setup_file.stat.exists == True
+    tags: hlrrdstore_setupfile_install
+
+  become: true
+  become_user: "{{becomeusr}}"
+  become_method: sudo

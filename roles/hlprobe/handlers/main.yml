@@ -1,0 +1,11 @@
+- name: systemctl daemon-reload
+  command: systemctl daemon-reload
+  become: yes
+
+- name: restart hlprobe
+  become: yes
+  service:
+    name: "hlprobe-{{item.probe_port}}"
+    state: restarted
+    enabled: yes
+  with_items: "{{hlprobe.probes}}"

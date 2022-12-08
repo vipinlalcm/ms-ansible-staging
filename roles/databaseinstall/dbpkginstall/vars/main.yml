@@ -1,0 +1,4 @@
+apt_dep_pkg:
+  - mariadb-server
+  - mariadb-client
+  - python-mysqldb

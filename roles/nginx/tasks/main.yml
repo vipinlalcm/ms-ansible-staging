@@ -1,0 +1,44 @@
+- name: Install Nginx and other packages.
+  apt:
+    name: "{{common_pkgs}}"
+    state: present
+  tags: common_pkg
+
+- block:
+  - name: create ssl dir
+    file:
+      path: "{{hlweb_home}}/ssl"
+      state: directory
+
+  - name: install ssl files
+    template:
+      src: "templates/ssl/{{item}}"
+      dest: "{{hlweb_home}}/ssl/{{item}}"
+    with_items:
+      - teliasoneraservercav2.cer
+      - hlwebalt.key
+      - hlwebalt.crt
+      - hlwebalt1.crt
+      - altweb-staging.monitorscout.com.crt
+
+
+  become: True
+  become_user: "{{becomeusr}}"
+
+- name: remove ubuntu default nginx site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: restart nginx
+
+- name: install nginx config
+  template:
+    src: "templates/nginx/{{item.name}}"
+    dest: "/etc/nginx/conf.d/{{item.servicename}}.conf"
+  notify: restart nginx
+  with_items:
+    - name: hlwebalt.conf
+      servicename: "{{hlweb_servicename}}"
+    - name: altweb.conf
+      servicename: "{{altweb_servicename}}"
+  tags: nginx_done

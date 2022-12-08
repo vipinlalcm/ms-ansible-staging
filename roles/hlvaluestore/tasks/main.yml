@@ -1,0 +1,36 @@
+- block:
+  - name: Cloning hlvaluestore
+    git:
+      repo: 'http://{{git_user}}:{{git_token}}@hl.test.io/monitoring/monitorscout/hlvaluestore.git'
+      version: master
+      dest: "{{virt_env_path}}/apps/hlvaluestore"
+      clone: yes
+    tags: hlvaluestore_clone
+
+  - name: Checking the requirements.txt
+    stat:
+      path: "{{virt_env_path}}/apps/hlvaluestore/requirements.txt"
+    register: hlvaluestore_requirements_file
+
+  - name: Install hlvaluestore requirements
+    command: pipenv run pip install -r requirements.txt
+    args:
+      chdir: "{{virt_env_path}}/apps/hlvaluestore"
+    when: hlvaluestore_requirements_file.stat.exists == True
+    tags: hlvaluestore_requirefile_install
+
+  - name: Checking setup.py file
+    stat:
+      path: "{{virt_env_path}}/apps/hlvaluestore/setup.py"
+    register: hlvaluestore_setup_file
+
+  - name: Setting up applications pipenv run python setup.py install
+    command: pipenv run python setup.py install
+    args:
+      chdir: "{{virt_env_path}}/apps/hlvaluestore"
+    when: hlvaluestore_setup_file.stat.exists == True
+    tags: hlvaluestore_setupfile_install
+
+  become: true
+  become_user: "{{becomeusr}}"
+  become_method: sudo

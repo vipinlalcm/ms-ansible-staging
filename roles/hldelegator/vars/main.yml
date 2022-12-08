@@ -1,0 +1,17 @@
+delegator_pip_pkg_deps:
+  - python-geoip
+  - service_identity
+  - pymysql
+  - twisted
+  - mako
+  - pytz
+  - MySQL-python
+  - geoip
+  - pyOpenSSL
+
+delegator_apt_pkg_deps:
+  - python-rrdtool
+  - python-twisted
+  - python-matplotlib
+  - python-tz
+  - rrdtool

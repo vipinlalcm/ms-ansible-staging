@@ -1,0 +1,8 @@
+ansible_ssh_user: itek
+ansible_connection: ssh
+ansible_ssh_port: 22
+hlprobe:
+  probes:
+    - probe_id: ba95239616a811ea8cc0001d0970370f
+      probe_port: 11001
+      probe_access_key: 9d65a1c960fd47db92e8654a01aab151

@@ -1,0 +1,18 @@
+hlrpc_application_dep_apt:
+  - python-geoip
+  - python-parsedatetime
+  - python-reportlab
+  - python-reportlab-accel
+  - python-zookeeper
+  - python-txzookeeper
+  - python-txamqp
+  - python-cffi
+  - libffi-dev
+  - libssl-dev
+hlrpc_pip_dep:
+  - python-memcached
+  - pyes
+  - py-dateutil
+  - textile
+  - bcrypt
+  - MySQL-python

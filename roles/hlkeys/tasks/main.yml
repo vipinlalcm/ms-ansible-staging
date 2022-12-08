@@ -1,0 +1,36 @@
+- block:
+  - name: Cloning hlkeys
+    git:
+      repo: 'http://{{git_user}}:{{git_token}}@hl.test.io/monitoring/monitorscout/hlkeys.git'
+      version: master
+      dest: "{{virt_env_path}}/apps/hlkeys"
+      clone: yes
+    tags: hlkeys_clone
+
+  - name: Checking the requirements.txt
+    stat:
+      path: "{{virt_env_path}}/apps/hlkeys/requirements.txt"
+    register: hlkeys_requirements_file
+
+  - name: Install hlrpcfront requirements
+    command: pipenv run pip install -r requirements.txt
+    args:
+      chdir: "{{virt_env_path}}/apps/hlkeys"
+    when: hlkeys_requirements_file.stat.exists == True
+    tags: hlkeys_requirefile_install
+
+  - name: Checking setup.py file
+    stat:
+      path: "{{virt_env_path}}/apps/hlkeys/setup.py"
+    register: hlkeys_setup_file
+
+  - name: Setting up applications pipenv run python setup.py install
+    command: pipenv run python setup.py install
+    args:
+      chdir: "{{virt_env_path}}/apps/hlkeys"
+    when: hlkeys_setup_file.stat.exists == True
+    tags: hlkeys_setupfile_install
+
+  become: true
+  become_user: "{{becomeusr}}"
+  become_method: sudo

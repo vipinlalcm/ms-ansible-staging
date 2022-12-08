@@ -1,0 +1,36 @@
+- block:
+  - name: Cloning hlerrorlog
+    git:
+      repo: 'http://{{git_user}}:{{git_token}}@hl.test.io/monitoring/monitorscout/hlerrorlog.git'
+      version: master
+      dest: "{{virt_env_path}}/apps/hlerrorlog"
+      clone: yes
+    tags: hlerrorlog_clone
+
+  - name: Checking the requirements.txt
+    stat:
+      path: "{{virt_env_path}}/apps/hlerrorlog/requirements.txt"
+    register: hlerrorlog_requirements_file
+
+  - name: Install hlerrorlog requirements
+    command: pipenv run pip install -r requirements.txt
+    args:
+      chdir: "{{virt_env_path}}/apps/hlerrorlog"
+    when: hlerrorlog_requirements_file.stat.exists == True
+    tags: hlerrorlog_requirefile_install
+
+  - name: Checking setup.py file
+    stat:
+      path: "{{virt_env_path}}/apps/hlerrorlog/setup.py"
+    register: hlerrorlog_setup_file
+
+  - name: Setting up applications pipenv run python setup.py install
+    command: pipenv run python setup.py install
+    args:
+      chdir: "{{virt_env_path}}/apps/hlerrorlog"
+    when: hlerrorlog_setup_file.stat.exists == True
+    tags: hlerrorlog_setupfile_install
+
+  become: true
+  become_user: "{{becomeusr}}"
+  become_method: sudo

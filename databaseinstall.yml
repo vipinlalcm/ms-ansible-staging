@@ -1,0 +1,7 @@
+- hosts: Staging_Entity_servers
+  become: true
+  roles:
+    - zookeeper
+    - databaseinstall
+  vars_files:
+    - vars/main.yml

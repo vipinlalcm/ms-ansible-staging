@@ -1,0 +1,8 @@
+ansible_ssh_user: test
+ansible_connection: ssh
+ansible_ssh_port: 22
+hlprobe:
+  probes:
+    - probe_id: e6a56f2a107c11e7b6e8001ec9b7c6f5
+      probe_port: 11001
+      probe_access_key: 941ea3798b7b41c68279b946ed9d206d

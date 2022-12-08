@@ -1,0 +1,7 @@
+- hosts: vmlnx-centreon01-New
+  roles:
+    - common
+    - hlprobe
+
+  vars_files:
+     - vars/main.yml

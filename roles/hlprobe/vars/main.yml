@@ -1,0 +1,19 @@
+hlprobe_username: hlprobe
+comment_for_user: 'user for hlprobe'
+hlprobe_login_shell: /bin/bash
+hlprobe_dep_apt_pkg:
+  - rrdtool
+  - fping
+  - python-rrdtool
+  - nagios-plugins
+  - nagios-plugins-standard
+  - nagios-plugins-basic
+  - libnagios-plugin-perl
+  - libdbi-perl
+  - libdbd-sybase-perl
+  - mtr-tiny
+  - python-geoip
+  - python-twisted
+  - python-twisted-mail
+  - python-pymssql
+  - python-ipaddr

@@ -1,0 +1,41 @@
+- name: Install depentencies for hlentitymanager applications.
+  apt:
+    name: "{{hlentiry_deps}}"
+    state: present
+
+- block:
+  - name: Cloning hlentitymanager
+    git:
+      repo: 'http://{{git_user}}:{{git_token}}@hl.test.io/monitoring/monitorscout/hlentitymanager.git'
+      version: master
+      dest: "{{virt_env_path}}/apps/hlentitymanager"
+      clone: yes
+    tags: hlentitymanager_clone
+
+  - name: Checking the requirements.txt
+    stat:
+      path: "{{virt_env_path}}/apps/hlentitymanager/requirements.txt"
+    register: hlentitymanager_requirements_file
+
+  - name: Install hlentitymanager requirements
+    command: pipenv run pip install -r requirements.txt
+    args:
+      chdir: "{{virt_env_path}}/apps/hlentitymanager"
+    when: hlentitymanager_requirements_file.stat.exists == True
+    tags: hlentitymanager_requirefile_install
+
+  - name: Checking setup.py file
+    stat:
+      path: "{{virt_env_path}}/apps/hlentitymanager/setup.py"
+    register: hlentitymanager_setup_file
+
+  - name: Setting up applications pipenv run python setup.py install
+    command: pipenv run python setup.py install
+    args:
+      chdir: "{{virt_env_path}}/apps/hlentitymanager"
+    when: hlentitymanager_setup_file.stat.exists == True
+    tags: hlentitymanager_setupfile_install
+
+  become: true
+  become_user: "{{becomeusr}}"
+  become_method: sudo

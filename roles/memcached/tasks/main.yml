@@ -1,0 +1,12 @@
+- name: Install memcached.
+  apt:
+    name: memcached
+    state: present
+- name: config memcached.
+  lineinfile:
+    path: "/etc/memcached.conf"
+    insertafter: EOF
+    state: present
+    line: '-l 0.0.0.0'
+  notify:
+    - start memcached

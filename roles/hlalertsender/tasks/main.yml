@@ -1,0 +1,46 @@
+- name: installing pip packages
+  pip:
+    name: "{{alert_sender_pip_pkg}}"
+    state: present
+
+- block:
+  - name: installing apt packages
+    apt:
+      name: "{{alert_sender_apt_pkg}}"
+      state: present
+
+  - name: Cloning hlalertsender
+    git:
+      repo: 'http://{{git_user}}:{{git_token}}@hl.test.io/monitoring/monitorscout/hlalertsender.git'
+      version: master
+      dest: "{{virt_env_path}}/apps/hlalertsender"
+      clone: yes
+    tags: hlalertsender_clone
+
+  - name: Checking the requirements.txt
+    stat:
+      path: "{{virt_env_path}}/apps/hlalertsender/requirements.txt"
+    register: hlalertsender_requirements_file
+
+  - name: Install hlalertsender requirements
+    command: pipenv run pip install -r requirements.txt
+    args:
+      chdir: "{{virt_env_path}}/apps/hlalertsender"
+    when: hlalertsender_requirements_file.stat.exists == True
+    tags: hlalertsender_requirefile_install
+
+  - name: Checking setup.py file
+    stat:
+      path: "{{virt_env_path}}/apps/hlalertsender/setup.py"
+    register: hlalertsender_setup_file
+
+  - name: Setting up applications pipenv run python setup.py install
+    command: pipenv run python setup.py install
+    args:
+      chdir: "{{virt_env_path}}/apps/hlalertsender"
+    when: hlalertsender_setup_file.stat.exists == True
+    tags: hlalertsender_setupfile_install
+
+  become: true
+  become_user: "{{becomeusr}}"
+  become_method: sudo

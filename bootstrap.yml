@@ -1,0 +1,3 @@
+- hosts: monitorscout_prod
+  roles:
+    - bootstrap

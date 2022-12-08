@@ -1,0 +1,24 @@
+---
+hlprobe_pypi_dependencies:
+  - requests[security]
+  - twisted
+  - pyopenssl
+  - service_identity
+  - ipaddr
+
+hlprobe_service_name: hlprobe
+hlprobe_username: hlprobe
+hlprobe_home: /var/opt/hlapps/apps/hlprobe
+hlprobe_monitor_binary_paths: "/usr/lib/nagios/plugins:{{hlprobe_home}}/hlprobe-binaries"
+hlprobe_external_job_dir: ''
+hlprobe_debug_logging: 'false'
+hlprobe_debug_logfile: /tmp/hlprobe_debug.log
+hlprobe_binaries_path: "{{hlprobe_home}}/binaries"
+hlprobe_hlprobelib_path: /usr/local/lib/python2.7/dist-packages/
+hlprobe_monitor_id: 47e871d8630211e7aae3001d0970370f
+hlprobe_monitor_api_key: 8ae5715b901a4552abe0b8ac5029051d
+hlprobe_git_repo: git@hl.test.io:monitoring/monitorscout/hlprobe.git
+hlprobe_binaries_git_repo: git@hl.test.io:monitoring/monitorscout/hlprobe-binaries.git
+hlprobe_configfile: "/etc/{{hlprobe_service_name}}.conf"
+hlprobe_logdir: "{{hlprobe_home}}/logs"
+hlprobe_fping_path: /usr/bin/fping

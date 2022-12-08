@@ -1,0 +1,3 @@
+hlentiry_deps:
+  - python-mako
+  - python-bcrypt

@@ -1,0 +1,12 @@
+git_token: -4WkJyDWuzJaEZw2fvMMJskdbsk
+git_user: msaccess
+becomeusr: hlapps
+virt_env_path: /var/opt/hlapps
+app_dirs:
+  - apps
+  - data
+  - deployment
+  - log
+  - pid
+app_files:
+  - me.txt

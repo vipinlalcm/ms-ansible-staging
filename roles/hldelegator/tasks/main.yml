@@ -1,0 +1,46 @@
+- name: Install python pip deps.
+  pip:
+    name: "{{delegator_pip_pkg_deps}}"
+    state: present
+
+- name: installing apt packages
+  apt:
+    name: "{{delegator_apt_pkg_deps}}"
+    state: present
+
+- block:
+  - name: Cloning hldelegator
+    git:
+      repo: 'http://{{git_user}}:{{git_token}}@hl.test.io/monitoring/monitorscout/hldelegator.git'
+      version: live
+      dest: "{{virt_env_path}}/apps/hldelegator"
+      clone: yes
+    tags: hldelegator_clone
+
+  - name: Checking the requirements.txt
+    stat:
+      path: "{{virt_env_path}}/apps/hldelegator/requirements.txt"
+    register: hldelegator_requirements_file
+
+  - name: Install hldelegator requirements
+    command: pipenv run pip install -r requirements.txt
+    args:
+      chdir: "{{virt_env_path}}/apps/hldelegator"
+    when: hldelegator_requirements_file.stat.exists == True
+    tags: hldelegator_requirefile_install
+
+  - name: Checking setup.py file
+    stat:
+      path: "{{virt_env_path}}/apps/hldelegator/setup.py"
+    register: hldelegator_setup_file
+
+  - name: Setting up applications pipenv run python setup.py install
+    command: pipenv run python setup.py install
+    args:
+      chdir: "{{virt_env_path}}/apps/hldelegator"
+    when: hldelegator_setup_file.stat.exists == True
+    tags: hldelegator_setupfile_install
+
+  become: true
+  become_user: "{{becomeusr}}"
+  become_method: sudo

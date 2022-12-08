@@ -1,0 +1,10 @@
+- name: restart hlweb
+  service:
+    name: "{{hlweb_servicename}}"
+    state: start
+    enabled: True
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted

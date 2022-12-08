@@ -1,0 +1,5 @@
+- hosts: all
+  become: True
+  become_user: hlapps
+  roles:
+    - sshkeygen

@@ -1,0 +1,36 @@
+- block:
+  - name: Cloning hlhousekeeper
+    git:
+      repo: 'http://{{git_user}}:{{git_token}}@hl.test.io/monitoring/monitorscout/hlhousekeeper.git'
+      version: master
+      dest: "{{virt_env_path}}/apps/hlhousekeeper"
+      clone: yes
+    tags: hlhousekeeper_clone
+
+  - name: Checking the requirements.txt
+    stat:
+      path: "{{virt_env_path}}/apps/hlhousekeeper/requirements.txt"
+    register: hlhousekeeper_requirements_file
+
+  - name: Install hlhousekeeper requirements
+    command: pipenv run pip install -r requirements.txt
+    args:
+      chdir: "{{virt_env_path}}/apps/hlhousekeeper"
+    when: hlhousekeeper_requirements_file.stat.exists == True
+    tags: hlhousekeeper_requirefile_install
+
+  - name: Checking setup.py file
+    stat:
+      path: "{{virt_env_path}}/apps/hlhousekeeper/setup.py"
+    register: hlhousekeeper_setup_file
+
+  - name: Setting up applications pipenv run python setup.py install
+    command: pipenv run python setup.py install
+    args:
+      chdir: "{{virt_env_path}}/apps/hlhousekeeper"
+    when: hlhousekeeper_setup_file.stat.exists == True
+    tags: hlhousekeeper_setupfile_install
+
+  become: true
+  become_user: "{{becomeusr}}"
+  become_method: sudo

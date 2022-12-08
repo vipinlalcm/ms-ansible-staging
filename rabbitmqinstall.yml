@@ -1,0 +1,6 @@
+- hosts: Staging_RabbitMQ_Servers
+  become: true
+  roles:
+    - rabbitmqsetup
+  vars_files:
+     - vars/main.yml

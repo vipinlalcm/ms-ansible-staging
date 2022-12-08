@@ -1,0 +1,38 @@
+- block:
+  - name: Create virtualenv for user hlapps.
+    shell: pipenv --two shell exit
+    args:
+      chdir: "{{virt_env_path}}"
+    tags: virtual
+
+  - name: Creating necessary directories for applications.
+    file:
+      path: "{{virt_env_path}}/{{item}}"
+      state: directory
+      mode: 0755
+    with_items: "{{app_dirs}}"
+
+  - name: Creating me.txt file and add hostname in it.
+    copy:
+      content: "{{inventory_hostname}}"
+      dest: "{{virt_env_path}}/me.txt"
+    tags: mefile
+
+  - name: Cloning config repo
+    git:
+      repo: 'http://{{git_user}}:{{git_token}}@hl.test.io/monitoring/monitorscout/config.git'
+      version: master
+      dest: "{{virt_env_path}}/config"
+      clone: yes
+
+  become: true
+  become_user: "{{becomeusr}}"
+  become_method: sudo
+
+- name: Cloning deployment repo
+  git:
+    repo: 'http://{{git_user}}:{{git_token}}@hl.test.io/monitoring/monitorscout/deployment.git'
+    version: master
+    dest: "{{virt_env_path}}/deployment"
+    clone: yes
+  tags: deployment_clone

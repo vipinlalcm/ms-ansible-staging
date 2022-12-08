@@ -1,0 +1,20 @@
+- name: install zookeeper
+  apt:
+    name: zookeeper
+    state: present
+
+- name: Configure zookeeper
+  copy:
+    content: '1'
+    dest: "/etc/zookeeper/conf/myid"
+
+- name: Starting zookeeper.
+  command: /usr/share/zookeeper/bin/zkServer.sh start
+  tags: zookeper_start
+
+- name: Adding zookeper start in rc.local.
+  lineinfile:
+    path: "/etc/rc.local"
+    insertafter: EOF
+    state: present
+    line: "/usr/share/zookeeper/bin/zkServer.sh start"

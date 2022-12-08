@@ -1,0 +1,36 @@
+- block:
+  - name: Cloning hlsharedentities
+    git:
+      repo: 'http://{{git_user}}:{{git_token}}@hl.test.io/monitoring/monitorscout/hlsharedentities.git'
+      version: master
+      dest: "{{virt_env_path}}/apps/hlsharedentities"
+      clone: yes
+    tags: hlsharedentities_clone
+
+  - name: Checking the requirements.txt
+    stat:
+      path: "{{virt_env_path}}/apps/hlsharedentities/requirements.txt"
+    register: hlsharedentities_requirements_file
+
+  - name: Install hlsharedentities requirements
+    command: pipenv run pip install -r requirements.txt
+    args:
+      chdir: "{{virt_env_path}}/apps/hlsharedentities"
+    when: hlsharedentities_requirements_file.stat.exists == True
+    tags: hlsharedentities_requirefile_install
+
+  - name: Checking setup.py file
+    stat:
+      path: "{{virt_env_path}}/apps/hlsharedentities/setup.py"
+    register: hlsharedentities_setup_file
+
+  - name: Setting up applications pipenv run python setup.py install
+    command: pipenv run python setup.py install
+    args:
+      chdir: "{{virt_env_path}}/apps/hlsharedentities"
+    when: hlsharedentities_setup_file.stat.exists == True
+    tags: hlsharedentities_setupfile_install
+
+  become: true
+  become_user: "{{becomeusr}}"
+  become_method: sudo

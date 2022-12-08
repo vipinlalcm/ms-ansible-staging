@@ -1,0 +1,55 @@
+- name: Create hlweb_webroot
+  file:
+    path: "{{hlweb_webroot}}"
+    state: directory
+    mode: 0755
+    owner: hlapps
+
+- block:
+  - name: Find virtualenv PATH
+    command: pipenv --venv
+    args:
+     chdir: "{{virt_env_path}}"
+    register: virtualenv
+    tags: find_venv,collectstatic
+
+  - name: Install django application
+    command: pipenv run pip install django
+    args:
+      chdir: "{{virt_env_path}}"
+    #environment: "{{hlweb_env}}"
+
+  - name: start django project
+    command: "{{virtualenv.stdout}}/bin/django-admin startproject {{hlweb_servicename}}"
+    args:
+      chdir: "{{hlweb_webroot}}"
+      creates: "{{hlweb_django_appdir}}/manage.py"
+    #environment: "{{hlweb_env}}"
+    tags: start_project
+
+  - name: install django app config
+    template:
+      src: "templates/django/{{item}}"
+      dest: "{{hlweb_django_projectdir}}/{{item}}"
+    with_items:
+      - urls.py
+      - settings.py
+
+  - name: run collectstatic for django
+    django_manage:
+      command: collectstatic
+      app_path: "{{hlweb_django_appdir}}"
+      virtualenv: "{{virtualenv.stdout}}"
+    tags: collectstatic
+
+  become: true
+  become_user: "{{becomeusr}}"
+  become_method: sudo
+
+- name: install hlwebalt systemd service unit
+  template:
+    src: templates/systemd/hlwebalt.service
+    dest: "/etc/systemd/system/{{hlweb_servicename}}.service"
+  notify:
+    - systemctl daemon-reload
+    - restart hlweb

@@ -1,0 +1,18 @@
+common_pkgs:
+  - nginx
+  - gunicorn
+  - uwsgi
+  - mariadb-client
+hlweb_listen_host: localhost
+hlweb_listen_port: 3001
+hlweb_domain: staging.monitorscout.com
+hlweb_webroot: "/var/www/hlweb"
+hlweb_home: "/var/opt/hlapps/apps"
+hlweb_ssl_path: "{{hlweb_home}}/ssl"
+hlweb_ssl_certificate: "{{hlweb_ssl_path}}/hlwebalt.crt"
+hlweb_ssl_certificate_key: "{{hlweb_ssl_path}}/hlwebalt.key"
+altweb_domain: altweb-staging.monitorscout.com
+altweb_ssl_certificate: "{{hlweb_ssl_path}}/altweb-staging.monitorscout.com.crt"
+altweb_ssl_certificate_key: "{{hlweb_ssl_certificate_key}}"
+altweb_servicename: altweb
+hlweb_servicename: hlwebalt_staging

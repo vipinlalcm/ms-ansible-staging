@@ -1,0 +1,10 @@
+- name: Installing database packages
+  import_role:
+    name: databaseinstall/dbpkginstall
+  tags: pakage_install
+
+
+- name: Configuring Database
+  import_role:
+    name: databaseinstall/dbconfigure
+  tags: configure

@@ -1,0 +1,41 @@
+# {{ ansible_managed }}
+
+[DEFAULT]
+# The id of the probe from the MS web interface.
+probe-id = {{item.probe_id}}
+# The key for the above probe.
+probe-key = {{item.probe_access_key}}
+# Maximum number of jobs to run simultaneously.
+max-concurrent-jobs = 100
+# Path to search for monitor binaries, for example nagios checks.
+# ':' separated.
+monitor-binary-paths = {{hlprobe_monitor_binary_paths}}
+# Path to search for external job (python) files.
+# ':' separated.
+# Like the jobs directory in hlprobelib
+external-job-dir = {{hlprobe_external_job_dir}}
+
+[LOGGING]
+debug-logging = {{hlprobe_debug_logging}}
+file = {{hlprobe_logdir}}/hlprobe-{{item.probe_port}}.log
+rotate-length = 250000
+max-rotated-files = 5
+
+# Size of twisted thread pool
+[JOBQUEUE]
+max-threads = 50
+
+# Hostnames used to check that the probe can access the network.
+[CONNECTIVITYCHECKER]
+check-hosts = www.google.com www.sunet.se
+fping-path = {{hlprobe_fping_path}}
+
+# Local managment port, deprecated.
+[LOCALRPC]
+port = {{item.probe_port}}
+
+# Optional passive monitor to update with probe heartbeats.
+# Must use id and api key of the monitor, not the probe
+[HEARTBEAT]
+probe-monitor-id = {{hlprobe_monitor_id}}
+probe-monitor-api-key = {{hlprobe_monitor_api_key}}

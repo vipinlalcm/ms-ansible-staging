@@ -1,0 +1,47 @@
+- block:
+  - name: Cloning hlmanagement
+    git:
+      repo: 'http://{{git_user}}:{{git_token}}@hl.test.io/monitoring/monitorscout/hlmanagement.git'
+      version: master
+      dest: "{{virt_env_path}}/apps/hlmanagement"
+      clone: yes
+    tags: hlmanagement_clone
+
+  - name: Checking the requirements.txt
+    stat:
+      path: "{{virt_env_path}}/apps/hlmanagement/requirements.txt"
+    register: hlmanagement_requirements_file
+
+  - name: Install hlmanagement requirements
+    command: pipenv run pip install -r requirements.txt
+    args:
+      chdir: "{{virt_env_path}}/apps/hlmanagement"
+    when: hlmanagement_requirements_file.stat.exists == True
+    tags: hlmanagement_requirefile_install
+
+  - name: Checking setup.py file
+    stat:
+      path: "{{virt_env_path}}/apps/hlmanagement/setup.py"
+    register: hlmanagement_setup_file
+
+  - name: Setting up hlmanagement pipenv run python setup.py install
+    command: pipenv run python setup.py install
+    args:
+      chdir: "{{virt_env_path}}/apps/hlmanagement"
+    when: hlmanagement_setup_file.stat.exists == True
+    tags: hlmanagement_setupfile_install
+
+  - name: Adding python libs in .bashrc
+    lineinfile:
+      path: "~/.bashrc"
+      state: present
+      insertafter: EOF
+      line: "export PYTHONPATH=$PYTHONPATH:$HOME/apps/hlpylib:$HOME/apps/hlsharedentities:$HOME/apps/hlentitymanager:$HOME/apps/hlexternallibs/libs"
+
+  become: true
+  become_user: "{{becomeusr}}"
+  become_method: sudo
+
+#- name: Starting applications.
+#  command: /var/opt/hlapps/deployment/bin/hlappmanager.py start-apps
+#  tags: start_apps

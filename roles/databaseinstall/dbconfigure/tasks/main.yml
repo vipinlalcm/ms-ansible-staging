@@ -1,0 +1,86 @@
+- name: Removes all anonymous user accounts
+  mysql_user:
+    name: ''
+    host_all: yes
+    state: absent
+
+- name: Setup root user.
+  mysql_user:
+    name: root
+    host: localhost
+    login_user: "{{mysql_root_user}}"
+    password: "{{mysql_root_pass}}"
+    state: present
+    update_password: on_create
+
+- name: Create monitorscout database
+  mysql_db:
+    name: "{{monitorscout_database}}"
+    login_user: "{{mysql_root_user}}"
+    login_password: "{{mysql_root_pass}}"
+    state: present
+
+- name: Create monitorscout session database
+  mysql_db:
+    name: "{{monitorscout_session_db}}"
+    login_user: "{{mysql_root_user}}"
+    login_password: "{{mysql_root_pass}}"
+    state: present
+
+- name: Configuring "health1_staging" database.
+  mysql_user:
+    name: "{{monitorscout_database_user}}"
+    host: "{{ item }}"
+    login_user: "{{mysql_root_user}}"
+    login_password: "{{mysql_root_pass}}"
+    password: "{{monitorscout_database_pass}}"
+    state: present
+    update_password: on_create
+    priv: '*.*:ALL,GRANT'
+  with_items: "{{allow_hosts}}"
+  tags: dbuser_create
+
+- name: Configuring "altweb_sessions" database.
+  mysql_user:
+    name: "{{monitorscout_session_db_user}}"
+    host: "{{ item }}"
+    login_user: "{{mysql_root_user}}"
+    login_password: "{{mysql_root_pass}}"
+    password: "{{monitorscout_session_db_pass}}"
+    state: present
+    update_password: on_create
+    priv: '*.*:ALL,GRANT'
+  with_items: "{{alt_web_allow_hosts}}"
+  tags: altweb_sessions
+
+- name: Copy monitorscout.sql file to entiry server.
+  copy:
+    src: "{{monitorscout_db_file}}"
+    dest: /tmp
+    force: yes
+  tags: copy_files
+
+- name: Copy altweb_sessions.sql file to entity server
+  copy:
+    src: "{{monitorscout_session_db_file}}"
+    dest: /tmp
+    force: yes
+  tags: copy_files
+
+- name: Import sql file into "health1_staging" database
+  mysql_db:
+    name: "{{monitorscout_database}}"
+    login_user: "{{monitorscout_database_user}}"
+    login_password: "{{monitorscout_database_pass}}"
+    state: import
+    target: /tmp/{{monitorscout_db_file}}
+  tags: import_db
+
+- name: Import sql file into "altweb_sessions" database
+  mysql_db:
+    name: "{{monitorscout_session_db}}"
+    login_user: "{{monitorscout_session_db_user}}"
+    login_password: "{{monitorscout_session_db_pass}}"
+    state: import
+    target: /tmp/{{monitorscout_session_db_file}}
+  tags: import_db

@@ -1,0 +1,4 @@
+- name: start memcached
+  service:
+    name: memcached
+    state: started

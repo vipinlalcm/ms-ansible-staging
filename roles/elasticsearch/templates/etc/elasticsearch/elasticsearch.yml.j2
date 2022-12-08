@@ -1,0 +1,12 @@
+cluster.name: health1
+node.name: "{{inventory_hostname}}"
+node.master: true
+node.data: true
+network.bind_host: 0.0.0.0
+network.publish_host: "{{inventory_hostname}}"
+network.host: 0.0.0.0
+transport.tcp.port: 9300
+http.port: 9200
+discovery.zen.minimum_master_nodes: 1
+discovery.zen.ping.multicast.enabled: false
+discovery.zen.ping.unicast.hosts: ["81.91.0.68", "81.91.0.55"]

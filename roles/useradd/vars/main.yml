@@ -1,0 +1,5 @@
+username: hlapps
+home_dir: /var/opt/hlapps
+login_shell: /bin/bash
+comment_for_user: user for monitorscout
+directory_path: /var/opt
